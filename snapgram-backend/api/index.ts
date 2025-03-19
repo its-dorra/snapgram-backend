@@ -2,10 +2,12 @@ import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
 
 export const config = {
-  runtime: 'node'
+  runtime: 'edge'
 }
 
-const app = new Hono().basePath('/api')
+const app = new Hono({
+  strict : false
+}).basePath('/api')
 
 app.get('/', (c) => {
   return c.json({ message: 'Hello Hono!' })
