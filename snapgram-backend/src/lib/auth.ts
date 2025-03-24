@@ -8,10 +8,15 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     usePlural: true,
-
   }),
   user: {
     modelName: "snapgram-user",
+    additionalFields: {
+      bio: {
+        type: "string",
+        required: false,
+      },
+    },
   },
   session: {
     modelName: "snapgram-session",

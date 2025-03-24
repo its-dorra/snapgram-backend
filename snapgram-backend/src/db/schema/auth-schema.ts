@@ -1,4 +1,9 @@
+import { relations } from "drizzle-orm";
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+import { likeTable } from "@/db/schema/like-schema";
+import { postTable } from "@/db/schema/post-schema";
+import { savedTable } from "@/db/schema/saved-schema";
 
 export const users = pgTable("snapgram-users", {
   id: text("id").primaryKey(),
@@ -8,6 +13,7 @@ export const users = pgTable("snapgram-users", {
   image: text("image"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+  bio: text("bio"),
 });
 
 export const sessions = pgTable("snapgram-sessions", {
@@ -45,3 +51,9 @@ export const verifications = pgTable("snapgram-verifications", {
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
+
+export const userRelations = relations(users, ({ many }) => ({
+  posts: many(postTable),
+  likes: many(likeTable),
+  savedPosts: many(savedTable),
+}));
