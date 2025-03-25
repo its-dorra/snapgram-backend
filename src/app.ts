@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { createApp } from "@/lib/create-app";
+import env from "@/lib/env";
 
 const app = createApp();
 
@@ -13,5 +14,5 @@ app.get("/", (c) => {
 // @ts-expect-error
 Bun.serve({
   fetch: app.fetch,
-  port: 3000,
+  port: env.PORT,
 });

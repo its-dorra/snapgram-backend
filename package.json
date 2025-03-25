@@ -1,7 +1,8 @@
 {
   "name": "snapgram-backend",
   "scripts": {
-    "start": "bun --watch run ./src/index.ts",
+    "dev": "bun --watch run src/app.ts",
+    "start": "bun src/app.ts",
     "lint": "eslint .",
     "lint:fix": "bun run lint --fix",
     "db:generate": "bunx drizzle-kit generate",
