@@ -1,8 +1,7 @@
 {
   "name": "snapgram-backend",
   "scripts": {
-    "start": "vercel dev",
-    "deploy": "vercel",
+    "start": "bun --watch run ./src/index.ts",
     "lint": "eslint .",
     "lint:fix": "bun run lint --fix",
     "db:generate": "bunx drizzle-kit generate",

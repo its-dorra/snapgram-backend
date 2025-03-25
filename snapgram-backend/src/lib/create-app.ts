@@ -11,9 +11,12 @@ export function createApp() {
   const app = createRouter().basePath("/api");
 
   app.use("*", cors({
-    origin: "*",
+    origin: "http://localhost:3001",
     credentials: true,
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
   }));
 
   return app;
