@@ -10,7 +10,9 @@
     "db:studio": "bunx drizzle-kit studio"
   },
   "dependencies": {
+    "@hono/arktype-validator": "^2.0.0",
     "@neondatabase/serverless": "^0.10.4",
+    "arktype": "^2.1.19",
     "better-auth": "^1.2.4",
     "drizzle-orm": "^0.41.0",
     "hono": "^4.7.4",

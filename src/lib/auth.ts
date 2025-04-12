@@ -16,13 +16,23 @@ export const auth = betterAuth({
       "snapgram-verification": schema.verifications,
     },
   }),
+  trustedOrigins: ["http://localhost:3001"],
   user: {
     modelName: "snapgram-user",
-
     additionalFields: {
       bio: {
         type: "string",
         required: false,
+      },
+      followingCount: {
+        type: "number",
+        min: 0,
+        defaultValue: 0,
+      },
+      followerCount: {
+        type: "number",
+        min: 0,
+        defaultValue: 0,
       },
     },
   },
@@ -55,6 +65,7 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
+    sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({
         from: "onboarding@resend.dev",

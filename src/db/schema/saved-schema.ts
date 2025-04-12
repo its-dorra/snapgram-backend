@@ -7,7 +7,7 @@ import { tableCreator } from "@/db/table-creator";
 
 export const savedTable = tableCreator("saved", {
   userId: text("user_id").notNull().references(() => users.id),
-  postId: uuid("post_id").references(() => postTable.id),
+  postId: uuid("post_id").notNull().references(() => postTable.id),
   createdAt: date("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: date("updated_at", { mode: "date" }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, t => ({

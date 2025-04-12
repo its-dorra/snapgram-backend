@@ -1,11 +1,13 @@
 import { relations } from "drizzle-orm";
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, text, timestamp } from "drizzle-orm/pg-core";
 
-import { likeTable } from "@/db/schema/like-schema";
+import { followTable } from "@/db/schema/follow-schema";
+import { likesTable } from "@/db/schema/like-schema";
 import { postTable } from "@/db/schema/post-schema";
 import { savedTable } from "@/db/schema/saved-schema";
+import { tableCreator } from "@/db/table-creator";
 
-export const users = pgTable("snapgram-users", {
+export const users = tableCreator("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
@@ -14,9 +16,11 @@ export const users = pgTable("snapgram-users", {
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
   bio: text("bio"),
+  followersCount: integer("followers_count").default(0),
+  followingsCount: integer("followings_count").default(0),
 });
 
-export const sessions = pgTable("snapgram-sessions", {
+export const sessions = tableCreator("sessions", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
@@ -27,7 +31,7 @@ export const sessions = pgTable("snapgram-sessions", {
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
 });
 
-export const accounts = pgTable("snapgram-accounts", {
+export const accounts = tableCreator("accounts", {
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
@@ -43,7 +47,7 @@ export const accounts = pgTable("snapgram-accounts", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const verifications = pgTable("snapgram-verifications", {
+export const verifications = tableCreator("verifications", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
@@ -54,6 +58,8 @@ export const verifications = pgTable("snapgram-verifications", {
 
 export const userRelations = relations(users, ({ many }) => ({
   posts: many(postTable),
-  likes: many(likeTable),
+  likes: many(likesTable),
   savedPosts: many(savedTable),
+  followers: many(followTable, { relationName: "followers" }),
+  followings: many(followTable, { relationName: "followings" }),
 }));

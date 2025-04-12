@@ -5,8 +5,6 @@ import env from "@/lib/env";
 
 import * as schema from "./schema";
 
-;
-
 // const sql = neon(env.DATABASE_URL);
 
 const sql = new Pool({

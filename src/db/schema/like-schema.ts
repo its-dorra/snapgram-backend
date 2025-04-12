@@ -5,9 +5,9 @@ import { users } from "@/db/schema/auth-schema";
 import { postTable } from "@/db/schema/post-schema";
 import { tableCreator } from "@/db/table-creator";
 
-export const likeTable = tableCreator("likes", {
+export const likesTable = tableCreator("likes", {
   userId: text("user_id").notNull().references(() => users.id),
-  postId: uuid("post_id").references(() => postTable.id),
+  postId: uuid("post_id").notNull().references(() => postTable.id),
   createdAt: date("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: date("updated_at", { mode: "date" }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, t => ({
@@ -16,13 +16,13 @@ export const likeTable = tableCreator("likes", {
   likePrimaryKey: primaryKey({ columns: [t.postId, t.userId] }),
 }));
 
-export const likeRelations = relations(likeTable, ({ one }) => ({
+export const likeRelations = relations(likesTable, ({ one }) => ({
   post: one(postTable, {
-    fields: [likeTable.postId],
+    fields: [likesTable.postId],
     references: [postTable.id],
   }),
   user: one(users, {
-    fields: [likeTable.userId],
+    fields: [likesTable.userId],
     references: [users.id],
   }),
 }));

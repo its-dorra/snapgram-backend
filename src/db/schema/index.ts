@@ -1,12 +1,15 @@
 import { accounts, sessions, userRelations, users, verifications } from "./auth-schema";
-import { likeRelations, likeTable } from "./like-schema";
+import { followRelations, followTable } from "./follow-schema";
+import { likeRelations, likesTable } from "./like-schema";
 import { postRelations, postTable } from "./post-schema";
 import { savedRelations, savedTable } from "./saved-schema";
 
 export {
   accounts,
+  followRelations,
+  followTable,
   likeRelations,
-  likeTable,
+  likesTable,
   postRelations,
   postTable,
   savedRelations,
