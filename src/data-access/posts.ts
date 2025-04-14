@@ -1,7 +1,7 @@
 import { and, count, desc, eq } from "drizzle-orm";
 
 import db from "@/db";
-import { followTable, likesTable, postTable, users } from "@/db/schema";
+import { followTable, likesTable, postTable, savedTable, users } from "@/db/schema";
 
 export async function getUserFeed({ userId, page, perPage }: { page: number; perPage: number; userId: string }) {
   const postsQuery = db
@@ -9,6 +9,9 @@ export async function getUserFeed({ userId, page, perPage }: { page: number; per
       post: postTable,
       likes: {
         userId: likesTable.userId,
+      },
+      saved: {
+        userId: savedTable.userId,
       },
       user: {
         id: users.id,
@@ -20,6 +23,7 @@ export async function getUserFeed({ userId, page, perPage }: { page: number; per
     .leftJoin(followTable, eq(postTable.userId, followTable.userId))
     .innerJoin(users, eq(users.id, postTable.userId))
     .leftJoin(likesTable, and(eq(likesTable.postId, postTable.id), eq(likesTable.userId, userId)))
+    .leftJoin(savedTable, and(eq(savedTable.postId, postTable.id), eq(savedTable.userId, userId)))
     .where(eq(followTable.followedBy, userId));
 
   const countQuery = db
@@ -43,6 +47,7 @@ export async function getUserFeed({ userId, page, perPage }: { page: number; per
       ...post.post,
       user: post.user,
       isLikedByCurrentUser: !!post.likes,
+      isSavedByCurrentUser: !!post.saved,
     })),
     pagination: {
       page,
@@ -61,6 +66,9 @@ export async function getPostsOfUser({ userId, page, perPage }: { page: number; 
       likes: {
         userId: likesTable.userId,
       },
+      saved: {
+        userId: savedTable.userId,
+      },
       user: {
         id: users.id,
         name: users.name,
@@ -70,6 +78,7 @@ export async function getPostsOfUser({ userId, page, perPage }: { page: number; 
     .from(postTable)
     .innerJoin(users, eq(users.id, postTable.userId))
     .leftJoin(likesTable, and(eq(likesTable.postId, postTable.id), eq(likesTable.userId, userId)))
+    .leftJoin(savedTable, and(eq(savedTable.postId, postTable.id), eq(savedTable.userId, userId)))
     .where(eq(postTable.userId, userId));
 
   const countQuery = db.$count(postsQuery);
@@ -87,6 +96,7 @@ export async function getPostsOfUser({ userId, page, perPage }: { page: number; 
       ...post.post,
       user: post.user,
       isLikedByCurrentUser: !!post.likes,
+      isSavedByCurrentUser: !!post.saved,
     })),
     pagination: {
       page,
@@ -97,6 +107,7 @@ export async function getPostsOfUser({ userId, page, perPage }: { page: number; 
     },
   };
 }
+
 export async function getPostById({ postId, userId }: { postId: string; userId: string }) {
   const postQuery = db
     .query
@@ -118,6 +129,13 @@ export async function getPostById({ postId, userId }: { postId: string; userId: 
           where: (t, { eq, and }) => and(eq(t.userId, userId), eq(t.postId, postId)),
           limit: 1,
         },
+        saveds: {
+          columns: {
+            userId: true,
+          },
+          where: (t, { eq, and }) => and(eq(t.userId, userId), eq(t.postId, postId)),
+          limit: 1,
+        }
       },
     });
 
@@ -129,5 +147,14 @@ export async function getPostById({ postId, userId }: { postId: string; userId: 
   return {
     ...post,
     isLikedByCurrentUser: post.likes.length === 1,
+    isSavedByCurrentUser: post.saveds.length === 1,
   };
+}
+
+export function createPost({ userId, caption, imageUrl, location, tags }: typeof postTable.$inferInsert) {
+  return db.insert(postTable).values({ userId, caption, imageUrl, location, tags }).returning();
+}
+
+export function editPost({ caption, location, tags, id, userId }: Partial<typeof postTable.$inferInsert> & { id: string ;userId: string }) {
+  return db.update(postTable).set({ caption, location, tags }).where(and(eq(postTable.id, id), eq(postTable.userId, userId))).returning().then(res => res?.[0]);
 }

@@ -16,8 +16,9 @@ export const users = tableCreator("users", {
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
   bio: text("bio"),
-  followersCount: integer("followers_count").default(0),
-  followingsCount: integer("followings_count").default(0),
+  followersCount: integer("followers_count").notNull().default(0),
+  followingsCount: integer("followings_count").notNull().default(0),
+  postsCount: integer("posts_count").notNull().default(0),
 });
 
 export const sessions = tableCreator("sessions", {

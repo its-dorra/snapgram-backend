@@ -7,7 +7,7 @@ export const createPostSchema = type({
   location: "string >= 3",
 });
 
-export const editPostSchema = createPostSchema.partial();
+export const editPostSchema = createPostSchema.omit('image').partial();
 
 // TODO: add validation for postId
 
@@ -17,7 +17,7 @@ export const postParamSchema = type({
 
 
 
-export const feedQuerySchema = type({
-  page: 'string.integer',
-  perPage: "string.integer",
+export const paginationSchema = type({
+  page: 'string.integer.parse',
+  perPage: "string.integer.parse",
 });

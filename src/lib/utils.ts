@@ -1,4 +1,4 @@
-export async function catchErrorTyped<T, E extends new (message?: string) => Error>(promise: Promise<T>, errorsToCatch?: E[]): Promise<[T, undefined] | [undefined, InstanceType<E>]> {
+export async function tryCatch<T, E extends new (message?: string) => Error>(promise: Promise<T>, errorsToCatch?: E[]): Promise<[T, undefined] | [undefined, InstanceType<E>]> {
   try {
     const data = await promise;
     return [data, undefined] as [T, undefined];

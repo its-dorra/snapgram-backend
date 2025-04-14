@@ -1,3 +1,5 @@
+import usersRouter from "@/routes/users.route";
+
 import { auth } from "@/lib/auth";
 import { createApp } from "@/lib/create-app";
 import env from "@/lib/env";
@@ -24,6 +26,7 @@ app.get("/", (c) => {
 });
 
 app.route("/posts", postsRouter);
+app.route("/users", usersRouter);
 
 // eslint-disable-next-line ts/ban-ts-comment
 // @ts-expect-error
