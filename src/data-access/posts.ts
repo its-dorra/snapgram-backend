@@ -1,4 +1,4 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, or } from "drizzle-orm";
 
 import db from "@/db";
 import { followTable, likesTable, postTable, savedTable, users } from "@/db/schema";
@@ -20,23 +20,23 @@ export async function getUserFeed({ userId, page, perPage }: { page: number; per
       },
     })
     .from(postTable)
-    .leftJoin(followTable, eq(postTable.userId, followTable.userId))
     .innerJoin(users, eq(users.id, postTable.userId))
+    .leftJoin(followTable, eq(postTable.userId, followTable.userId))
     .leftJoin(likesTable, and(eq(likesTable.postId, postTable.id), eq(likesTable.userId, userId)))
     .leftJoin(savedTable, and(eq(savedTable.postId, postTable.id), eq(savedTable.userId, userId)))
-    .where(eq(followTable.followedBy, userId));
+    .where(or(eq(followTable.followedBy, userId), eq(postTable.userId, userId)))
+    .limit(perPage)
+    .offset((page - 1) * perPage)
+    .orderBy(desc(postTable.createdAt));
 
   const countQuery = db
     .select({ totalCount: count() })
     .from(postTable)
     .leftJoin(followTable, eq(postTable.userId, followTable.userId))
-    .where(eq(followTable.followedBy, userId));
+    .where(or(eq(followTable.followedBy, userId),eq(postTable.userId, userId)));
 
   const [posts, [{ totalCount }]] = await Promise.all([
-    postsQuery
-      .limit(perPage)
-      .offset((page - 1) * perPage)
-      .orderBy(desc(postTable.createdAt)),
+    postsQuery,  
     countQuery,
   ]);
 
@@ -135,7 +135,7 @@ export async function getPostById({ postId, userId }: { postId: string; userId: 
           },
           where: (t, { eq, and }) => and(eq(t.userId, userId), eq(t.postId, postId)),
           limit: 1,
-        }
+        },
       },
     });
 

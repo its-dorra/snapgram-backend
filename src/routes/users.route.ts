@@ -1,7 +1,7 @@
 import { arktypeValidator } from "@hono/arktype-validator";
 
 import { getPostsOfUser } from "@/data-access/posts";
-import { getUserInfo } from "@/data-access/users";
+import { getUserInfo, getUserLikedPosts } from "@/data-access/users";
 import { createRouter } from "@/lib/create-app";
 import { paginationSchema } from "@/lib/schemas";
 import { tryCatch } from "@/lib/utils";
@@ -35,6 +35,18 @@ router.get("/:userId/posts", arktypeValidator("query", paginationSchema), async 
   }
 
   return c.json({ success: true, data: posts });
+});
+
+router.get("/me/likes", async (c) => {
+  const { id: userId } = c.var.user;
+
+  const [likes, error] = await tryCatch(getUserLikedPosts({ userId }));
+
+  if (error) {
+    return c.json({ message: "Internal server error" }, 500);
+  }
+
+  return c.json({ success: true, data: likes });
 });
 
 export default router;
